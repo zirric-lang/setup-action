@@ -1,0 +1,46 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        zirric-version: [latest, v0.1.0]
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: zirric
+        uses: ./
+        with:
+          zirric-version: ${{ matrix.zirric-version }}
+
+      - name: Report resolved version
+        run: |
+          echo "version: ${{ steps.zirric.outputs.zirric-version }}"
+          echo "binary:  ${{ steps.zirric.outputs.zirric-bin }}"
+          echo "cached:  ${{ steps.zirric.outputs.cache-hit }}"
+
+      - name: Run a Zirric program
+        run: zirric run examples/hello.zirr
+
+  version-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: echo "0.1.0" > .zirric-version
+
+      - id: zirric
+        uses: ./
+        with:
+          zirric-version-file: .zirric-version
+
+      - run: |
+          test "${{ steps.zirric.outputs.zirric-version }}" = "0.1.0"
+          zirric run examples/hello.zirr

@@ -1,0 +1,93 @@
+name: Setup Zirric
+description: Install the zirric toolchain, put it on PATH and export ZIRRIC_PATH.
+author: zirric-lang
+
+branding:
+  icon: download
+  color: purple
+
+inputs:
+  zirric-version:
+    description: >-
+      Release to install: a tag such as `v0.1.0-alpha.1`, a bare version such as
+      `0.1.0-alpha.1`, or `latest` for the newest release.
+    required: false
+    default: latest
+  zirric-version-file:
+    description: >-
+      Read the version from this file instead of `zirric-version`. Supports
+      `.tool-versions` (asdf) and plain files containing a single version.
+    required: false
+    default: ''
+  prerelease:
+    description: >-
+      Whether `latest` may resolve to a pre-release. Off by default, so `latest`
+      means the newest stable release; turn it on to track alphas and betas.
+    required: false
+    default: 'false'
+  forge-url:
+    description: Base URL of the Forgejo instance hosting the zirric releases.
+    required: false
+    default: https://code.knabel.dev
+  repository:
+    description: Repository that publishes the zirric releases.
+    required: false
+    default: zirric-lang/zirric
+  token:
+    description: Token used for the release API and downloads, if the forge requires authentication.
+    required: false
+    default: ''
+  install-dir:
+    description: >-
+      Directory the archive is extracted into. Defaults to
+      `$RUNNER_TOOL_CACHE/zirric/<version>/<arch>`, which is reused across steps
+      and, on self-hosted runners, across jobs.
+    required: false
+    default: ''
+  zirric-path:
+    description: >-
+      Value exported as `ZIRRIC_PATH`, the directory zirric uses for its package
+      registry. Defaults to `$HOME/.zirric`.
+    required: false
+    default: ''
+  verify-checksum:
+    description: Verify the downloaded archive against the release `checksums.txt`.
+    required: false
+    default: 'true'
+
+outputs:
+  zirric-version:
+    description: Installed version without the leading `v`, e.g. `0.1.0-alpha.1`.
+    value: ${{ steps.setup.outputs.zirric-version }}
+  zirric-tag:
+    description: Release tag that was installed, e.g. `v0.1.0-alpha.1`.
+    value: ${{ steps.setup.outputs.zirric-tag }}
+  zirric-bin:
+    description: Absolute path of the `zirric` binary.
+    value: ${{ steps.setup.outputs.zirric-bin }}
+  zirric-dir:
+    description: Directory that was added to `PATH`.
+    value: ${{ steps.setup.outputs.zirric-dir }}
+  zirric-path:
+    description: Value exported as `ZIRRIC_PATH`.
+    value: ${{ steps.setup.outputs.zirric-path }}
+  cache-hit:
+    description: '`true` when the version was already present in the tool cache.'
+    value: ${{ steps.setup.outputs.cache-hit }}
+
+runs:
+  using: composite
+  steps:
+    - id: setup
+      shell: bash
+      env:
+        ZIRRIC_SETUP_VERSION: ${{ inputs.zirric-version }}
+        ZIRRIC_SETUP_VERSION_FILE: ${{ inputs.zirric-version-file }}
+        ZIRRIC_SETUP_PRERELEASE: ${{ inputs.prerelease }}
+        ZIRRIC_SETUP_FORGE_URL: ${{ inputs.forge-url }}
+        ZIRRIC_SETUP_REPOSITORY: ${{ inputs.repository }}
+        ZIRRIC_SETUP_TOKEN: ${{ inputs.token }}
+        ZIRRIC_SETUP_INSTALL_DIR: ${{ inputs.install-dir }}
+        ZIRRIC_SETUP_ZIRRIC_PATH: ${{ inputs.zirric-path }}
+        ZIRRIC_SETUP_VERIFY_CHECKSUM: ${{ inputs.verify-checksum }}
+      run: bash "${{ github.action_path }}/scripts/setup-zirric.sh"

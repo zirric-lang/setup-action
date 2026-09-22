@@ -1,0 +1,4 @@
+import fmt
+import os
+
+fmt.fprintln("hello from zirric", os.stdout())
