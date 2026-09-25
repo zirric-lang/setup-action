@@ -18,15 +18,15 @@ inputs:
       Read the version from this file instead of `zirric-version`. Supports
       `.tool-versions` (asdf) and plain files containing a single version.
     required: false
-    default: ''
+    default: ""
   prerelease:
     description: >-
       Whether `latest` may resolve to a pre-release. Off by default, so `latest`
       means the newest stable release; turn it on to track alphas and betas.
     required: false
-    default: 'false'
+    default: "false"
   forge-url:
-    description: Base URL of the Forgejo instance hosting the zirric releases.
+    description: Base URL of the Forgejo or GitHub instance hosting the zirric releases.
     required: false
     default: https://code.knabel.dev
   repository:
@@ -36,24 +36,24 @@ inputs:
   token:
     description: Token used for the release API and downloads, if the forge requires authentication.
     required: false
-    default: ''
+    default: ""
   install-dir:
     description: >-
       Directory the archive is extracted into. Defaults to
       `$RUNNER_TOOL_CACHE/zirric/<version>/<arch>`, which is reused across steps
       and, on self-hosted runners, across jobs.
     required: false
-    default: ''
+    default: ""
   zirric-path:
     description: >-
       Value exported as `ZIRRIC_PATH`, the directory zirric uses for its package
       registry. Defaults to `$HOME/.zirric`.
     required: false
-    default: ''
+    default: ""
   verify-checksum:
     description: Verify the downloaded archive against the release `checksums.txt`.
     required: false
-    default: 'true'
+    default: "true"
 
 outputs:
   zirric-version:
@@ -72,7 +72,7 @@ outputs:
     description: Value exported as `ZIRRIC_PATH`.
     value: ${{ steps.setup.outputs.zirric-path }}
   cache-hit:
-    description: '`true` when the version was already present in the tool cache.'
+    description: "`true` when the version was already present in the tool cache."
     value: ${{ steps.setup.outputs.cache-hit }}
 
 runs:
